@@ -13,16 +13,14 @@ use tokio::sync::Notify;
 
 /// Type alias for our shared state.
 /// Uses `parking_lot::RwLock` for better performance than `std::sync::RwLock`.
-///
-/// Note: Without extra `Arc`:
-/// - Can't clone point to use it outside the lock
-/// - Can't move point out of the `HashMap` either
-pub type WaitPoints = Arc<RwLock<HashMap<String, Arc<WaitPoint>>>>;
+/// Outer `Arc` is not needed, because Rocket's State<T> already provides the sharing mechanism we need
+/// Without inner `Arc`, we wouldn't be able to apply `.cloned()`
+pub type WaitPoints = RwLock<HashMap<String, Arc<WaitPoint>>>;
 
 /// Represents a synchronization point where two parties can meet
 pub struct WaitPoint {
     /// Notifies the first waiting party when the second party arrives
-    pub notify: Arc<Notify>,
+    pub notify: Notify,
     /// Atomic (thread-safe) counter to track how many parties have arrived (0, 1, or 2). Single CPU instruction, never blocks
     /// Note: `Mutex` is overkill for simple counter, requires kernel-level locking/resources, threads block waiting for lock
     pub parties_count: AtomicUsize,
@@ -31,13 +29,12 @@ pub struct WaitPoint {
 impl WaitPoint {
     pub(crate) fn new() -> Self {
         Self {
-            notify: Arc::new(Notify::new()),
+            notify: Notify::new(),
             parties_count: AtomicUsize::new(0),
         }
     }
 }
 
-#[derive(Clone)]
 pub struct AppState {
     pub wait_points: WaitPoints,
     pub timeout: Duration,
@@ -65,7 +62,7 @@ impl AppState {
         let timeout_secs: u64 = config.get("timeout")?;
         Self::is_valid_timeout(timeout_secs)?;
 
-        let wait_points: WaitPoints = Arc::new(RwLock::new(HashMap::new()));
+        let wait_points: WaitPoints = RwLock::new(HashMap::new());
         let app_state = Self {
             wait_points,
             timeout: Duration::from_secs(timeout_secs),
