@@ -1,0 +1,27 @@
+[package]
+name = "sync-point"
+version = "0.1.0"
+edition = "2021"
+
+# name: Uses hyphen (sync-point) following CLI tool conventions (e.g., cargo-watch, rust-analyzer)
+[[bin]]
+name = "sync-point"
+path = "src/main.rs"
+
+[lib]
+name = "sync_point"  # Use underscore here
+path = "src/lib.rs"
+
+[dependencies]
+tokio = "1.42.0"
+rocket = { version = "0.5.0-rc.3", features = ["json"] }
+serde = { version = "1.0.216", features = ["derive"] }
+serde_json = "1.0.133"
+parking_lot = "0.12.3"
+config = "0.14.1"
+log = "0.4"
+env_logger = "0.11.5"
+
+[dev-dependencies]
+tempfile = "3.14.0"
+serial_test = "3.2.0"
