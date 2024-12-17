@@ -15,6 +15,7 @@ use tokio::sync::Notify;
 /// Uses `parking_lot::RwLock` for better performance than `std::sync::RwLock`.
 /// Outer `Arc` is not needed, because Rocket's State<T> already provides the sharing mechanism we need
 /// Without inner `Arc`, we wouldn't be able to apply `.cloned()`
+/// `RwLock` itself provides thread-safe sharing
 pub type WaitPoints = RwLock<HashMap<String, Arc<WaitPoint>>>;
 
 /// Represents a synchronization point where two parties can meet
