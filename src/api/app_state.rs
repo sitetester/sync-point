@@ -26,8 +26,6 @@ pub struct WaitPoint {
     /// Atomic (thread-safe) counter to track how many parties have arrived (0, 1, or 2). Single CPU instruction, never blocks
     /// Note: `Mutex` is overkill for simple counter, requires kernel-level locking/resources, threads block waiting for lock
     pub parties_count: AtomicUsize,
-    /// Timestamp when this wait point was created (used for cleanup)
-    pub created_at: std::time::Instant,
 }
 
 impl WaitPoint {
@@ -35,7 +33,6 @@ impl WaitPoint {
         Self {
             notify: Arc::new(Notify::new()),
             parties_count: AtomicUsize::new(0),
-            created_at: std::time::Instant::now(),
         }
     }
 }
@@ -152,7 +149,7 @@ mod tests {
     async fn test_app_config_file_timeout() -> Result<(), ConfigError> {
         use tempfile::TempDir;
         use tokio::fs;
-        
+
         let temp_dir = TempDir::new().unwrap();
         let config_path = temp_dir.path().join("config.toml");
         fs::write(&config_path, "timeout = 20")
