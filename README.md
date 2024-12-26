@@ -1,6 +1,6 @@
 
 ```
-**Small web service with one endpoint: /wait-for-second-party/:unique-id**
+Small web service with one endpoint: /wait-for-second-party/:unique-id**
 
 This endpoint allows two parties to sync.
 When one party makes a POST request, the response will be delayed until the second party requests the same URL.
