@@ -6,7 +6,7 @@
 use crate::api::app_state::AppState;
 use crate::api::routes::{index, wait_for_party};
 use log::debug;
-use rocket::{build, routes, Build, Rocket};
+use rocket::{self, routes, Build, Rocket};
 
 pub mod api; // Declare the api module
 
@@ -23,7 +23,7 @@ pub fn build_rocket() -> Rocket<Build> {
     };
     let app_state = state_result.expect("Failed to initialize AppState");
 
-    build()
+    rocket::build()
         .manage(app_state)
         // Mounts a collection of routes at the base path "/"
         .mount("/", routes![index, wait_for_party])
