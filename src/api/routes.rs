@@ -38,15 +38,13 @@ pub fn index() -> &'static str {
 /// From another terminal, second party joins
 /// curl -X POST http://127.0.0.1:8000/wait-for-second-party/123
 ///
-/// Success Response
-/// json
+/// Success Response:
 /// {
 ///     "status": "success",
 ///     "message": "Welcome! (second party)"
 /// }
 ///
-/// Timeout Response
-/// json
+/// Timeout Response:
 /// {
 ///     "status": "timeout",
 ///     "message": "Request timed out",
