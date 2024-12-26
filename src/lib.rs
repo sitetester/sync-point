@@ -3,10 +3,10 @@
 // Instead, `lib.rs` defines all of  project's modules, which can be accessed
 // by any binary (`main.rs`) or test module in the project.
 
-use log::debug;
-use rocket::{build, routes, Build, Rocket};
 use crate::api::app_state::AppState;
 use crate::api::routes::{index, wait_for_party};
+use log::debug;
+use rocket::{build, routes, Build, Rocket};
 
 pub mod api; // Declare the api module
 
@@ -14,14 +14,14 @@ pub mod api; // Declare the api module
 /// Accessible from application as well as tests
 pub fn build_rocket() -> Rocket<Build> {
     let path = "config.toml";
-    let app_state = if std::path::Path::new(path).exists() {
+    let state_result = if std::path::Path::new(path).exists() {
         debug!("{} found", path);
         AppState::new(Some(path))
     } else {
         debug!("{} not found", path);
         AppState::new(None)
-    }
-        .expect("Failed to initialize AppState");
+    };
+    let app_state = state_result.expect("Failed to initialize AppState");
 
     build()
         .manage(app_state)
