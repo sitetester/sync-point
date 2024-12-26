@@ -110,6 +110,7 @@ impl AppState {
     }
 }
 
+/// Builds and configures a Rocket application instance.
 pub fn build_rocket() -> Rocket<Build> {
     let path = "config.toml";
     let app_state = if std::path::Path::new(path).exists() {
@@ -123,6 +124,7 @@ pub fn build_rocket() -> Rocket<Build> {
 
     build()
         .manage(app_state)
+        // Mounts a collection of routes at the base path "/"
         .mount("/", routes![index, wait_for_party])
 }
 

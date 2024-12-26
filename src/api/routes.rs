@@ -8,6 +8,7 @@ use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use std::time::Duration;
 
+/// Handles GET requests to the root endpoint "/"
 #[get("/")]
 pub fn index() -> &'static str {
     "Welcome to Sync Point API"
@@ -19,6 +20,38 @@ pub fn index() -> &'static str {
 /// - If they're first, they'll wait for the second party
 /// - If they're second, they'll notify the first party
 /// - If more parties try to join, they'll be rejected
+///
+/// # Arguments
+/// * `unique_id` - A string identifier for matching parties
+/// * `state` - Application state containing synchronization data
+///
+/// # Returns
+/// a `Custom<Json<ApiResponse>>` with:
+/// * Status code indicating success or failure
+/// * JSON response containing the result or error message
+///
+/// # Testing with cURL
+///
+/// First party initiates the wait
+/// curl -X POST http://127.0.0.1:8000/wait-for-second-party/123
+///
+/// From another terminal, second party joins
+/// curl -X POST http://127.0.0.1:8000/wait-for-second-party/123
+///
+/// Success Response
+/// json
+/// {
+///     "status": "success",
+///     "message": "Welcome! (second party)"
+/// }
+///
+/// Timeout Response
+/// json
+/// {
+///     "status": "timeout",
+///     "message": "Request timed out",
+///     "timeout_duration_sec": 10
+/// }
 #[post("/wait-for-second-party/<unique_id>")]
 pub async fn wait_for_party(
     unique_id: &str,
