@@ -36,6 +36,7 @@ impl WaitPoint {
     }
 }
 
+/// Application state shared across all routes
 pub struct AppState {
     pub wait_points: WaitPoints,
     pub timeout: Duration,
