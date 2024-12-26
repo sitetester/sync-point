@@ -11,6 +11,8 @@ In other words, the first party is blocked until the second party arrives or a t
 Rocket has launched from http://127.0.0.1:8000
 ```
 
+---
+
 ### Testing
 **via CURL**
 - curl -X POST http://127.0.0.1:8000/wait-for-second-party/123 (from one terminal tab/window)
@@ -30,4 +32,6 @@ but if only one party tries to join, then the timeout response should be
 2 types of tests are provided. Unit & Integration
 - `src/api/app_state.rs` functionality is tested via unit tests, hence tests are provided in the same file.
 - `tests/routes.rs` while this file contains integration tests, covering different scenarios.
+
+---
 
