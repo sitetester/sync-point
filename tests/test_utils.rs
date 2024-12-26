@@ -2,8 +2,9 @@ use rocket::http::Status;
 use rocket::local::asynchronous::{Client, LocalResponse};
 use serde_json::{json, Value};
 use std::sync::Arc;
-use sync_point::api::app_state::{build_rocket, AppState};
 use tokio::task::JoinHandle;
+use sync_point::api::app_state::AppState;
+use sync_point::build_rocket;
 
 pub struct TestResponse {
     pub status: Status,

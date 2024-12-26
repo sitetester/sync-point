@@ -1,10 +1,8 @@
 use crate::api::response::ApiError;
-use crate::api::routes::{index, wait_for_party};
 use config::File;
 use config::{Config, ConfigError, Environment, FileFormat};
 use log::{debug};
 use parking_lot::RwLock;
-use rocket::{build, routes, Build, Rocket};
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
@@ -111,23 +109,7 @@ impl AppState {
     }
 }
 
-/// Builds and configures a Rocket application instance.
-pub fn build_rocket() -> Rocket<Build> {
-    let path = "config.toml";
-    let app_state = if std::path::Path::new(path).exists() {
-        debug!("{} found", path);
-        AppState::new(Some(path))
-    } else {
-        debug!("{} not found", path);
-        AppState::new(None)
-    }
-    .expect("Failed to initialize AppState");
 
-    build()
-        .manage(app_state)
-        // Mounts a collection of routes at the base path "/"
-        .mount("/", routes![index, wait_for_party])
-}
 
 #[cfg(test)]
 mod tests {

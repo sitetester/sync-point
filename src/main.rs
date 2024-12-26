@@ -1,4 +1,4 @@
-use sync_point::api::app_state::build_rocket;
+use sync_point::build_rocket;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
