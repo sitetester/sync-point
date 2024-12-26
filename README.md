@@ -19,13 +19,14 @@ Rocket has launched from http://127.0.0.1:8000
 ### Testing
 **via CURL**
 - curl -X POST http://127.0.0.1:8000/wait-for-second-party/123 (from one terminal tab/window)
-- curl -X POST http://127.0.0.1:8000/wait-for-second-party/123 (from another terminal tab/window)
-if both parties join within the `timeout` duration (10 sec), it should return such JSON responses
+- curl -X POST http://127.0.0.1:8000/wait-for-second-party/123 (from another terminal tab/window).  
+
+If both parties join within the `timeout` duration (10 sec), it should return such JSON responses
 ```aiignore
 {"status":"success","message":"Welcome! (first party)"}
 {"status":"success","message":"Welcome! (second party)"}
 ```
-but if only one party tries to join, then it should return such timeout response
+but if only one party tries to join, then the timeout response should be
 ```aiignore
 {"status":"timeout","message":"Request timed out","timeout_duration_sec":10}
 ```
