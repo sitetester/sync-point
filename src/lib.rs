@@ -24,6 +24,8 @@ pub fn build_rocket() -> Rocket<Build> {
     let app_state = state_result.expect("Failed to initialize AppState");
 
     rocket::build()
+        // Attach our application state to Rocket's managed state
+        // This makes the AppState available to all route handlers
         .manage(app_state)
         // Mounts a collection of routes at the base path "/"
         .mount("/", routes![index, wait_for_party])
