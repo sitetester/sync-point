@@ -10,7 +10,8 @@ use crate::api::routes::{index, wait_for_party};
 
 pub mod api; // Declare the api module
 
-/// Builds and configures a Rocket application instance.
+/// Builds and configures a Rocket application instance.  
+/// Accessible from application as well as tests
 pub fn build_rocket() -> Rocket<Build> {
     let path = "config.toml";
     let app_state = if std::path::Path::new(path).exists() {
