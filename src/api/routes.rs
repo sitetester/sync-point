@@ -34,14 +34,16 @@ pub async fn wait_for_party(
     unique_id: &str,
     state: &State<AppState>
 ) -> Custom<Json<ApiResponse>> {
-    // 
+    // A closure
     let get_or_create_point = || -> Result<Arc<WaitPoint>, ApiError> {
         // Try to get existing point
+        // With an attempt to acquire a read lock without blocking
         if let Some(guard) = state.wait_points.try_read() {
             // `.cloned` will turn `&Arc<WaitPoint>` into `Arc<WaitPoint>`
             if let Some(point) = guard.get(&unique_id.to_owned()).cloned() {
                 return Ok(point);
             }
+            // The lock is automatically released when `guard` goes out of scope
         } else {
             return Err(ApiError::LockError("Failed to acquire read lock".into()));
         }
