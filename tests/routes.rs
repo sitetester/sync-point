@@ -86,33 +86,33 @@ mod tests {
 
     /// Let's make sure our API is functional for 2 unique endpoints
     /// & have no concurrent access issues
-   #[rocket::async_test]
-   async fn test_successful_sync_for_2_unique_ids() {
-       let client = Arc::new(get_client().await);
-
-       // 2 parties for same unique_id
-       let handle1 = spawn_request(client.clone(), UNIQUE_ID.to_string());
-       tokio::time::sleep(Duration::from_millis(100)).await;
-       let handle2 = spawn_request(client.clone(), UNIQUE_ID.to_string());
-       tokio::time::sleep(Duration::from_millis(100)).await; 
+    #[rocket::async_test]
+    async fn test_successful_sync_for_2_unique_ids() {
+        let client = Arc::new(get_client().await);
         
-       // Choosing a different pattern this time
-       let another_unique_id = "abcDef-456".to_string();
+        // Choosing a different pattern this time
+        let another_unique_id = "abcDef-456".to_string();
+        
+        let handle1 = spawn_request(client.clone(), UNIQUE_ID.to_string());
+        tokio::time::sleep(Duration::from_millis(100)).await;
 
-       // another 2 parties for same another_unique_id
-       let handle3 = spawn_request(client.clone(), another_unique_id.clone());
-       tokio::time::sleep(Duration::from_millis(100)).await;
-       let handle4 = spawn_request(client.clone(), another_unique_id.clone());
-       tokio::time::sleep(Duration::from_millis(100)).await;
+        let handle3 = spawn_request(client.clone(), another_unique_id.clone());
+        tokio::time::sleep(Duration::from_millis(100)).await;
 
-       let response1 = handle1.await.expect("first response");
-       let response2 = handle2.await.expect("second response");
-       let response3 = handle3.await.expect("second response");
-       let response4 = handle4.await.expect("second response");
+        let handle2 = spawn_request(client.clone(), UNIQUE_ID.to_string());
+        tokio::time::sleep(Duration::from_millis(100)).await;
 
-       assert_success_response(&response1, "first");
-       assert_success_response(&response2, "second");
-       assert_success_response(&response3, "first");
-       assert_success_response(&response4, "second");
-   }
+        let handle4 = spawn_request(client.clone(), another_unique_id.clone());
+        tokio::time::sleep(Duration::from_millis(100)).await;
+
+        let response1 = handle1.await.expect("first response");
+        let response2 = handle2.await.expect("second response");
+        let response3 = handle3.await.expect("second response");
+        let response4 = handle4.await.expect("second response");
+
+        assert_success_response(&response1, "first");
+        assert_success_response(&response2, "second");
+        assert_success_response(&response3, "first");
+        assert_success_response(&response4, "second");
+    }
 }
