@@ -1,7 +1,7 @@
 use crate::api::response::ApiError;
 use config::File;
 use config::{Config, ConfigError, Environment, FileFormat};
-use log::{debug};
+use log::debug;
 use parking_lot::RwLock;
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
@@ -56,15 +56,12 @@ impl AppState {
     /// * `Ok(AppState)` - Successfully initialized application state
     /// * `Err(ConfigError)` - If configuration is invalid or file cannot be read
     pub fn new(config_path: Option<&str>) -> Result<Self, ConfigError> {
-        let mut builder = Config::builder().set_default("timeout", Self::DEFAULT_TIMEOUT)?;
-
-        // Add config file source if path is provided
-        if let Some(path) = config_path {
-            builder = builder.add_source(File::new(path, FileFormat::Toml).required(true));
-        }
-
-        let config = builder
-            .add_source(File::new("config", FileFormat::Toml).required(false))
+        let config = Config::builder()
+            .set_default("timeout", Self::DEFAULT_TIMEOUT)?
+            .add_source(match config_path {
+                Some(path) => File::new(path, FileFormat::Toml).required(true),
+                None => File::new("config", FileFormat::Toml).required(false),
+            })
             // e.g. APP_TIMEOUT=30, check relevant `test_app_env_timeout` test below
             .add_source(Environment::with_prefix("APP"))
             .build()?;
@@ -157,10 +154,9 @@ impl AppState {
         }
 
         // Create new point otherwise
-        self
-            .wait_points
-            .try_write() // returns None otherwise
-            .map(|mut points| {
+        self.wait_points
+            .try_write()
+            .map(|mut points| { // If write lock acquired
                 // `points  is a mutable reference to the HashMap inside the lock
                 let point = Arc::new(WaitPoint::new());
                 // `point.clone()` because we want to return this `point` (pointer) eventually
@@ -174,7 +170,6 @@ impl AppState {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::api::app_state::AppState;
@@ -187,7 +182,10 @@ mod tests {
     async fn test_app_default_timeout() -> Result<(), ConfigError> {
         // Without config file
         let state = AppState::new(None)?;
-        assert_eq!(state.timeout, Duration::from_secs(AppState::DEFAULT_TIMEOUT));
+        assert_eq!(
+            state.timeout,
+            Duration::from_secs(AppState::DEFAULT_TIMEOUT)
+        );
         Ok(())
     }
 
