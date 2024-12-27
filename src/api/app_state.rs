@@ -156,7 +156,6 @@ impl AppState {
             return Err(ApiError::LockError("Failed to acquire read lock".into()));
         }
 
-        // pub type WaitPoints = RwLock<HashMap<String, Arc<WaitPoint>>>;
         // Create new point otherwise
         self
             .wait_points
