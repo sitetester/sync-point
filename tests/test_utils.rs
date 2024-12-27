@@ -18,15 +18,16 @@ pub async fn get_response_json(response: LocalResponse<'_>) -> Value {
         .expect("Failed to parse JSON")
 }
 
-pub async fn make_sync_request(client: &Client) -> TestResponse {
-    let response = client.post("/wait-for-second-party/123").dispatch().await;
+pub async fn make_sync_request(client: &Client, unique_id: &str) -> TestResponse {
+    let endpoint = format!("/wait-for-second-party/{}", unique_id);
+    let response = client.post(endpoint).dispatch().await;
     let status = response.status();
     let json = get_response_json(response).await;
     TestResponse { status, json }
 }
 
-pub fn spawn_request(client: Arc<Client>) -> JoinHandle<TestResponse> {
-    tokio::spawn(async move { make_sync_request(&client).await })
+pub fn spawn_request(client: Arc<Client>, unique_id: String) -> JoinHandle<TestResponse> {
+    tokio::spawn(async move { make_sync_request(&client, unique_id.as_str()).await })
 }
 
 pub async fn get_client() -> Client {
