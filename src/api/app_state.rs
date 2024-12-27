@@ -45,7 +45,16 @@ impl AppState {
     const MAX_TIMEOUT: u64 = 300;
     const DEFAULT_TIMEOUT: u64 = 10;
 
-    /// Creates a new instance of the application configuration
+    /// Creates a new instance of the application state with configuration.
+    ///
+    /// # Arguments
+    /// * `config_path` - Optional path to TOML configuration file
+    ///
+    /// Configuration can also be provided via  `APP_` prefixed environment variables
+    ///
+    /// # Returns
+    /// * `Ok(AppState)` - Successfully initialized application state
+    /// * `Err(ConfigError)` - If configuration is invalid or file cannot be read
     pub fn new(config_path: Option<&str>) -> Result<Self, ConfigError> {
         let mut builder = Config::builder().set_default("timeout", Self::DEFAULT_TIMEOUT)?;
 
@@ -56,6 +65,7 @@ impl AppState {
 
         let config = builder
             .add_source(File::new("config", FileFormat::Toml).required(false))
+            // e.g. APP_TIMEOUT=30, check relevant `test_app_env_timeout` test below
             .add_source(Environment::with_prefix("APP"))
             .build()?;
 
@@ -72,6 +82,14 @@ impl AppState {
         Ok(app_state)
     }
 
+    /// Validates that the timeout value is within acceptable bounds.
+    ///
+    /// # Arguments
+    /// * `timeout` - The timeout value in seconds
+    ///
+    /// # Returns
+    /// * `Ok(())` - If timeout is within [MIN_TIMEOUT, MAX_TIMEOUT] range
+    /// * `Err(ConfigError)` - If timeout is outside the valid range
     fn is_valid_timeout(timeout: u64) -> Result<(), ConfigError> {
         if timeout < Self::MIN_TIMEOUT {
             return Err(ConfigError::Message(format!(
@@ -88,6 +106,14 @@ impl AppState {
         Ok(())
     }
 
+    /// Removes a wait point from the application state.
+    ///
+    /// # Arguments
+    /// * `unique_id` - The unique identifier of the wait point to remove
+    ///
+    /// # Returns
+    /// * `Ok(())` - If the wait point was successfully removed or didn't exist
+    /// * `Err(ApiError)` - If failed to acquire write lock
     pub fn cleanup_wait_point(&self, unique_id: &str) -> Result<(), ApiError> {
         match self.wait_points.try_write() {
             Some(mut points) => {
@@ -107,8 +133,47 @@ impl AppState {
             }
         }
     }
-}
 
+    /// Gets an existing wait point or creates a new one if it doesn't exist.
+    ///
+    /// # Arguments
+    /// * `unique_id` - The unique identifier for the wait point
+    ///
+    /// # Returns
+    /// * `Ok(Arc<WaitPoint>)` - The existing or newly created wait point
+    /// * `Err(ApiError)` - If failed to acquire read or write lock
+    pub fn get_or_create_point(&self, unique_id: &str) -> Result<Arc<WaitPoint>, ApiError> {
+        // Try to get existing point
+        // With an attempt to acquire a read lock without blocking (deadlock prevention)
+        // Contrary `read()` will block until lock is available
+        if let Some(guard) = self.wait_points.try_read() {
+            // `.cloned` will turn `&Arc<WaitPoint>` into `Arc<WaitPoint>`
+            if let Some(point) = guard.get(&unique_id.to_owned()).cloned() {
+                return Ok(point);
+            }
+            // The lock is automatically released when `guard` goes out of scope
+        } else {
+            return Err(ApiError::LockError("Failed to acquire read lock".into()));
+        }
+
+        // pub type WaitPoints = RwLock<HashMap<String, Arc<WaitPoint>>>;
+        // Create new point otherwise
+        self
+            .wait_points
+            .try_write() // returns None otherwise
+            .map(|mut points| {
+                // `points  is a mutable reference to the HashMap inside the lock
+                let point = Arc::new(WaitPoint::new());
+                // `point.clone()` because we want to return this `point` (pointer) eventually
+                // Both refer to the same WaitPoint instance (actual WaitPoint data lives on the heap)
+                let point_clone = point.clone();
+                // The HashMap needs to own a reference to the WaitPoint
+                points.insert(unique_id.to_owned(), point_clone);
+                point // Some(WriteGuard) -> Some(Arc<WaitPoint))
+            })
+            .ok_or_else(|| ApiError::LockError("Failed to acquire write lock".into()))
+    }
+}
 
 
 #[cfg(test)]

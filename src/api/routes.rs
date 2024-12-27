@@ -31,34 +31,7 @@ pub fn index() -> &'static str {
 /// * JSON response containing the result or error message
 #[post("/wait-for-second-party/<unique_id>")]
 pub async fn wait_for_party(unique_id: &str, state: &State<AppState>) -> Custom<Json<ApiResponse>> {
-    // A closure
-    let get_or_create_point = || -> Result<Arc<WaitPoint>, ApiError> {
-        // Try to get existing point
-        // With an attempt to acquire a read lock without blocking (deadlock prevention)
-        // Contrary `read()` will block until lock is available
-        if let Some(guard) = state.wait_points.try_read() {
-            // `.cloned` will turn `&Arc<WaitPoint>` into `Arc<WaitPoint>`
-            if let Some(point) = guard.get(&unique_id.to_owned()).cloned() {
-                return Ok(point);
-            }
-            // The lock is automatically released when `guard` goes out of scope
-        } else {
-            return Err(ApiError::LockError("Failed to acquire read lock".into()));
-        }
-
-        // Create new point otherwise
-        state
-            .wait_points
-            .try_write()
-            .map(|mut points| {
-                let point = Arc::new(WaitPoint::new());
-                points.insert(unique_id.to_owned(), point.clone());
-                point
-            })
-            .ok_or_else(|| ApiError::LockError("Failed to acquire write lock".into()))
-    };
-
-    let point = match get_or_create_point() {
+    let point = match state.get_or_create_point(unique_id) {
         Ok(point) => point,
         Err(e) => return e.into(),
     };
