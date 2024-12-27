@@ -30,14 +30,12 @@ pub fn index() -> &'static str {
 /// * Status code indicating success or failure
 /// * JSON response containing the result or error message
 #[post("/wait-for-second-party/<unique_id>")]
-pub async fn wait_for_party(
-    unique_id: &str,
-    state: &State<AppState>
-) -> Custom<Json<ApiResponse>> {
+pub async fn wait_for_party(unique_id: &str, state: &State<AppState>) -> Custom<Json<ApiResponse>> {
     // A closure
     let get_or_create_point = || -> Result<Arc<WaitPoint>, ApiError> {
         // Try to get existing point
-        // With an attempt to acquire a read lock without blocking
+        // With an attempt to acquire a read lock without blocking (deadlock prevention)
+        // Contrary `read()` will block until lock is available
         if let Some(guard) = state.wait_points.try_read() {
             // `.cloned` will turn `&Arc<WaitPoint>` into `Arc<WaitPoint>`
             if let Some(point) = guard.get(&unique_id.to_owned()).cloned() {
@@ -49,7 +47,8 @@ pub async fn wait_for_party(
         }
 
         // Create new point otherwise
-        state.wait_points
+        state
+            .wait_points
             .try_write()
             .map(|mut points| {
                 let point = Arc::new(WaitPoint::new());
@@ -61,28 +60,33 @@ pub async fn wait_for_party(
 
     let point = match get_or_create_point() {
         Ok(point) => point,
-        Err(e) => return e.into()
+        Err(e) => return e.into(),
     };
 
     let previous = point.parties_count.fetch_add(1, Ordering::SeqCst);
     match previous {
-        0 => handle_first_party(point, unique_id, state).await.unwrap_or_else(Into::into),
+        0 => handle_first_party(point, unique_id, state)
+            .await
+            .unwrap_or_else(Into::into),
         1 => handle_second_party(point, unique_id).unwrap_or_else(Into::into),
-        _ => handle_extra_party(previous, unique_id).unwrap_or_else(Into::into)
+        _ => handle_extra_party(previous, unique_id).unwrap_or_else(Into::into),
     }
 }
 
 async fn handle_first_party(
     point: Arc<WaitPoint>,
     unique_id: &str,
-    state: &State<AppState>
+    state: &State<AppState>,
 ) -> Result<Custom<Json<ApiResponse>>, ApiError> {
     // Wait for a notification with a timeout
     // A future which completes when `notify_one()` or `notify_waiters()` is called
-    match tokio::time::timeout(
+    let result = tokio::time::timeout(
         Duration::from_secs(state.timeout.as_secs()),
         point.notify.notified(),
-    ).await {
+    )
+    .await;
+
+    match result {
         Ok(_) => {
             log::debug!("Notification received for unique_id: {}", unique_id);
             state.cleanup_wait_point(unique_id)?;
@@ -99,7 +103,10 @@ async fn handle_first_party(
     }
 }
 
-fn handle_second_party(point: Arc<WaitPoint>, unique_id: &str) -> Result<Custom<Json<ApiResponse>>, ApiError> {
+fn handle_second_party(
+    point: Arc<WaitPoint>,
+    unique_id: &str,
+) -> Result<Custom<Json<ApiResponse>>, ApiError> {
     log::debug!("Second party arrived for unique_id: {}", unique_id);
     point.notify.notify_one();
     Ok(Custom(
@@ -108,7 +115,10 @@ fn handle_second_party(point: Arc<WaitPoint>, unique_id: &str) -> Result<Custom<
     ))
 }
 
-fn handle_extra_party(previous: usize, unique_id: &str) -> Result<Custom<Json<ApiResponse>>, ApiError> {
+fn handle_extra_party(
+    previous: usize,
+    unique_id: &str,
+) -> Result<Custom<Json<ApiResponse>>, ApiError> {
     log::debug!(
         "Unexpected party count {} for unique_id: {}",
         previous,
@@ -119,4 +129,3 @@ fn handle_extra_party(previous: usize, unique_id: &str) -> Result<Custom<Json<Ap
         Json(ApiResponse::error("Only 2 parties allowed at a time")),
     ))
 }
-

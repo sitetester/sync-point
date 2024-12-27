@@ -1,8 +1,9 @@
-use serde::{Deserialize, Serialize};
-use std::time::Duration;
 use rocket::http::Status;
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
+use serde::{Deserialize, Serialize};
+use std::time::Duration;
+
 #[derive(Debug)]
 pub enum ApiError {
     LockError(String),
@@ -13,21 +14,19 @@ pub enum ApiError {
 impl From<ApiError> for Custom<Json<ApiResponse>> {
     fn from(error: ApiError) -> Self {
         match error {
-            ApiError::LockError(msg) => Custom(
-                Status::InternalServerError,
-                Json(ApiResponse::error(&msg)),
-            ),
-            ApiError::TimeoutError(duration) => Custom(
-                Status::RequestTimeout,
-                Json(ApiResponse::timeout(duration)),
-            ),
+            ApiError::LockError(msg) => {
+                Custom(Status::InternalServerError, Json(ApiResponse::error(&msg)))
+            }
+            ApiError::TimeoutError(duration) => {
+                Custom(Status::RequestTimeout, Json(ApiResponse::timeout(duration)))
+            }
             ApiError::CleanupError(msg) => {
                 log::error!("Cleanup error: {}", msg);
                 Custom(
                     Status::InternalServerError,
                     Json(ApiResponse::error("Internal server error during cleanup")),
                 )
-            },
+            }
         }
     }
 }
@@ -58,7 +57,7 @@ impl ApiResponse {
     }
 
     pub fn timeout(duration: Duration) -> Self {
-        Self{
+        Self {
             status: ResponseStatus::Timeout,
             message: "Request timed out".into(),
             timeout_duration_sec: Some(duration.as_secs()),
