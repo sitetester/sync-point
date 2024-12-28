@@ -16,7 +16,7 @@ In other words, the first party is blocked until the second party arrives or a t
 ### Testing
 **via CURL**
 - curl -X POST http://127.0.0.1:8000/wait-for-second-party/123 (from one terminal tab/window)
-- curl -X POST http://127.0.0.1:8000/wait-for-second-party/123 (from another terminal tab/window).  
+- curl -X POST http://127.0.0.1:8000/wait-for-second-party/123 (from another terminal tab/window) 
 
 If both parties join within the `timeout` duration (10 sec), it should return such JSON responses
 ```aiignore
