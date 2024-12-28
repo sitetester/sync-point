@@ -1,7 +1,7 @@
 use crate::api::response::ApiError;
 use config::File;
 use config::{Config, ConfigError, Environment, FileFormat};
-use log::debug;
+use log::{debug, error};
 use parking_lot::RwLock;
 use std::collections::HashMap;
 use std::sync::atomic::AtomicUsize;
@@ -122,10 +122,12 @@ impl AppState {
                 Ok(())
             }
             None => {
-                debug!(
+                // Log technical details for debugging/troubleshooting
+                error!(
                     "Failed to acquire write lock for cleanup of wait point: {}",
                     unique_id
                 );
+                // Return user-friendly error message
                 Err(ApiError::LockError(
                     "Failed to acquire write lock for cleanup".into(),
                 ))
