@@ -8,24 +8,16 @@ use std::time::Duration;
 pub enum ApiError {
     LockError(String),
     TimeoutError(Duration),
-    CleanupError(String),
 }
 
 impl From<ApiError> for Custom<Json<ApiResponse>> {
     fn from(error: ApiError) -> Self {
         match error {
             ApiError::LockError(msg) => {
-                Custom(Status::InternalServerError, Json(ApiResponse::error(&msg)))
+                Custom(Status::InternalServerError, Json(ApiResponse::error(msg)))
             }
             ApiError::TimeoutError(duration) => {
                 Custom(Status::RequestTimeout, Json(ApiResponse::timeout(duration)))
-            }
-            ApiError::CleanupError(msg) => {
-                log::error!("Cleanup error: {}", msg);
-                Custom(
-                    Status::InternalServerError,
-                    Json(ApiResponse::error("Internal server error during cleanup")),
-                )
             }
         }
     }
