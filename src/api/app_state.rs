@@ -160,7 +160,8 @@ impl AppState {
         // Create new point otherwise
         self.wait_points
             .try_write()
-            .map(|mut points| { // If write lock acquired
+            .map(|mut points| {
+                // If write lock acquired
                 // `points  is a mutable reference to the HashMap inside the lock
                 let point = Arc::new(WaitPoint::new());
                 // `point.clone()` because we want to return this `point` (pointer) eventually
@@ -174,6 +175,8 @@ impl AppState {
     }
 }
 
+/// The `#[serial]` attribute is used to mark tests that should run sequentially (not in parallel)
+/// This is to avoid timeout conflicts occurring from config file or env vars
 #[cfg(test)]
 mod tests {
     use crate::api::app_state::AppState;
