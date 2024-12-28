@@ -50,7 +50,7 @@ impl AppState {
     /// # Arguments
     /// * `config_path` - Optional path to TOML configuration file
     ///
-    /// Configuration can also be provided via  `APP_` prefixed environment variables
+    /// Configuration can also be provided via `APP_` prefixed environment variable
     ///
     /// # Returns
     /// * `Ok(AppState)` - Successfully initialized application state
