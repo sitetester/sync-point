@@ -67,7 +67,7 @@ impl AppState {
             .build()?;
 
         let timeout_secs: u64 = config.get("timeout")?;
-        Self::is_valid_timeout(timeout_secs)?;
+        Self::validate_timeout(timeout_secs)?;
 
         let wait_points: WaitPoints = RwLock::new(HashMap::new());
         let app_state = Self {
@@ -87,7 +87,7 @@ impl AppState {
     /// # Returns
     /// * `Ok(())` - If timeout is within [MIN_TIMEOUT, MAX_TIMEOUT] range
     /// * `Err(ConfigError)` - If timeout is outside the valid range
-    fn is_valid_timeout(timeout: u64) -> Result<(), ConfigError> {
+    fn validate_timeout(timeout: u64) -> Result<(), ConfigError> {
         if timeout < Self::MIN_TIMEOUT {
             return Err(ConfigError::Message(format!(
                 "Timeout cannot be less than {} seconds",
