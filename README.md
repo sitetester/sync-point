@@ -8,7 +8,7 @@ In other words, the first party is blocked until the second party arrives or a t
 ### Setup
 - `cargo run` (it will install dependencies & start Rocket web server). Example output
 ```aiignore
-Rocket has launched from http://127.0.0.1:8000
+[2024-12-28T06:41:51Z WARN  rocket::launch] 🚀 Rocket has launched from http://127.0.0.1:8000
 ```
 
 ---
