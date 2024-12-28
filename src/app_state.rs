@@ -179,7 +179,7 @@ impl AppState {
 /// This is to avoid timeout conflicts occurring from config file or env vars
 #[cfg(test)]
 mod tests {
-    use crate::api::app_state::AppState;
+    use crate::app_state::AppState;
     use config::ConfigError;
     use serial_test::serial;
     use std::time::Duration;

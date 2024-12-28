@@ -3,7 +3,7 @@ use rocket::local::asynchronous::{Client, LocalResponse};
 use serde_json::{json, Value};
 use std::sync::Arc;
 use tokio::task::JoinHandle;
-use sync_point::api::app_state::AppState;
+use sync_point::app_state::AppState;
 use sync_point::build_rocket;
 
 pub struct TestResponse {

@@ -1,4 +1,3 @@
-// Declare relevant modules
-pub mod app_state;
+// Exposes the relevant modules
 pub mod response;
 pub mod routes;

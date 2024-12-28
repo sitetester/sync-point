@@ -1,4 +1,4 @@
-use crate::api::app_state::{AppState, WaitPoint};
+use crate::app_state::{AppState, WaitPoint};
 use crate::api::response::{ApiError, ApiResponse};
 use rocket::http::Status;
 use rocket::response::status::Custom;

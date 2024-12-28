@@ -2,13 +2,14 @@
 // This eliminates the need to manually declare `mod api;` in `main.rs`.
 // Instead, `lib.rs` defines all of  project's modules, which can be accessed
 // by any binary (`main.rs`) or test module in the project.
-
-use crate::api::app_state::AppState;
+use app_state::AppState;
 use crate::api::routes::{index, wait_for_party};
 use log::debug;
 use rocket::{self, routes, Build, Rocket};
 
-pub mod api; // Declare the api module
+// Public modules available to other crates
+pub mod api;
+pub mod app_state;
 
 /// Builds and configures a Rocket application instance.  
 /// Accessible from application as well as tests

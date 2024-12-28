@@ -9,7 +9,7 @@ mod tests {
     use rocket::http::Status;
     use std::sync::Arc;
     use std::time::Duration;
-    use sync_point::api::app_state::AppState;
+    use sync_point::app_state::AppState;
 
     const UNIQUE_ID: &str = "123";
 
