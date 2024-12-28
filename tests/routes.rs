@@ -1,8 +1,8 @@
-mod test_utils;
+mod common;
 
 #[cfg(test)]
 mod tests {
-    use crate::test_utils::{
+    use crate::common::{
         assert_success_response, assert_timeout_response, get_client, make_sync_request,
         spawn_request,
     };
