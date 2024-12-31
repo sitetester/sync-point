@@ -40,9 +40,9 @@ pub async fn wait_for_party(unique_id: &str, state: &State<AppState>) -> Custom<
     match previous {
         0 => handle_first_party(point, unique_id, state)
             .await
-            .unwrap_or_else(Into::into),
-        1 => handle_second_party(point, unique_id).unwrap_or_else(Into::into),
-        _ => handle_extra_party(previous, unique_id).unwrap_or_else(Into::into),
+            .unwrap_or_else(|e| e.into()),
+        1 => handle_second_party(point, unique_id).unwrap_or_else(|e| e.into()),
+        _ => handle_extra_party(previous, unique_id).unwrap_or_else(|e| e.into()),
     }
 }
 
