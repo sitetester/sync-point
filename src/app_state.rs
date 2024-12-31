@@ -21,7 +21,7 @@ pub struct WaitPoint {
     /// Notifies the first waiting party when the second party arrives
     pub notify: Notify,
     /// Atomic (thread-safe) counter to track how many parties have arrived (0, 1, or 2). Single CPU instruction, never blocks
-    /// Note: `Mutex` is overkill for simple counter, requires kernel-level locking/resources, threads block waiting for lock
+    /// `Mutex` is overkill for simple counter, requires kernel-level locking/resources, threads block waiting for lock
     pub parties_count: AtomicUsize,
 }
 
