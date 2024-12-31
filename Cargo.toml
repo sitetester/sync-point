@@ -22,6 +22,8 @@ config = "0.14.1"
 log = "0.4"
 env_logger = "0.11.5"
 
+
+# Are automatically included when running tests in any environment, including CI/CD pipelines
 [dev-dependencies]
 tempfile = "3.14.0"
 serial_test = "3.2.0"
