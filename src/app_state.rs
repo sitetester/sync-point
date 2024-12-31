@@ -175,7 +175,7 @@ impl AppState {
     }
 }
 
-/// The `#[serial]` attribute is used to mark tests that should run sequentially (not in parallel)
+/// The `#[serial]` attribute is used to mark tests that should run sequentially
 /// This is to avoid timeout conflicts occurring from config file or env vars
 #[cfg(test)]
 mod tests {
