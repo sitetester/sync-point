@@ -42,7 +42,7 @@ pub struct AppState {
 }
 
 impl AppState {
-    // Currently hardcoded values, but could be made configurable from outside.
+    // Currently hardcoded values, but could be configurable from outside.
     const MIN_TIMEOUT: u64 = 5;
     const MAX_TIMEOUT: u64 = 300;
     const DEFAULT_TIMEOUT: u64 = 10;
