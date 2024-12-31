@@ -1,7 +1,7 @@
 // It automatically acts as the entry point (root of module tree) for declaring and organizing modules.
 // This eliminates the need to manually declare `mod api;` in `main.rs`.
 // Instead, `lib.rs` defines all of  project's modules, which can be accessed
-// by any binary (`main.rs`) or test module in the project.
+// from anywhere in project (`main.rs` or tests)
 use app_state::AppState;
 use crate::api::routes::{index, wait_for_party};
 use log::debug;
