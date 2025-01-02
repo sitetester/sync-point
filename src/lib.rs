@@ -8,6 +8,8 @@ use log::debug;
 use rocket::{self, routes, Build, Rocket};
 
 // Public modules available to other crates
+// since the binary crate is technically a separate crate that 
+// depends on this library crate
 pub mod api;
 pub mod app;
 
