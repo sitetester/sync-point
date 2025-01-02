@@ -38,7 +38,7 @@ impl WaitPoint {
     }
 }
 
-/// Manages the logic when 2 or more parties attempt to connect on some unique identifier 
+/// Manages the logic when 2 or more parties attempt to connect on some unique identifier
 pub struct SyncService {
     pub wait_points: WaitPoints,
 }
@@ -101,12 +101,11 @@ impl SyncService {
     /// # Arguments
     /// * `unique_id` - A string identifier for matching parties
     /// * `point: Arc<WaitPoint>` - The existing wait point created for first party
-    /// * `state` - Application state containing the timeout & sync service
     ///
     /// # Returns
     /// a `Custom<Json<ApiResponse>>` with:
     /// * HTTP Status code indicating relevant success/failure reason
-    /// * JSON response with success/error/timeout status and a friendly message
+    /// * JSON response with success status and a friendly message
     pub fn handle_second_party(
         &self,
         unique_id: &str,
