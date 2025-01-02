@@ -56,7 +56,7 @@ impl SyncService {
     /// # Arguments
     /// * `unique_id` - A string identifier for matching parties
     /// * `point: Arc<WaitPoint>` - The newly created wait point
-    /// * `state` - Application state containing the sync service
+    /// * `state` - Application state containing the timeout config
     ///
     /// # Returns
     /// a `Custom<Json<ApiResponse>>` with:
