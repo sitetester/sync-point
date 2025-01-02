@@ -124,7 +124,7 @@ impl SyncService {
     ///
     /// In general, this should never happen, since after second party has notified the first,
     /// the third party should be considered by the system as freshly joined party (first party)
-    /// because the relevant parties count is reset by the first.
+    /// because the relevant wait point is removed.
     ///
     /// # Arguments
     /// * `unique_id` - A string identifier for matching parties
