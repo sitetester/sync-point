@@ -2,9 +2,9 @@ use rocket::http::Status;
 use rocket::local::asynchronous::{Client, LocalResponse};
 use serde_json::{json, Value};
 use std::sync::Arc;
-use tokio::task::JoinHandle;
-use sync_point::app_state::AppState;
+use sync_point::app::App;
 use sync_point::build_rocket;
+use tokio::task::JoinHandle;
 
 pub struct TestResponse {
     pub status: Status,
@@ -37,27 +37,27 @@ pub async fn get_client() -> Client {
         .expect("valid rocket instance")
 }
 
-pub fn assert_success_response(response: &TestResponse, party_type: &str) {
+pub fn assert_success_response(response: &TestResponse, unique_id: &str, party_type: &str) {
     assert_eq!(response.status, Status::Ok);
 
     assert_eq!(
         response.json,
         json!({
             "status": "success",
-            "message": format!("Welcome! ({} party)", party_type)
+            "message": format!("[{}] Welcome! ({} party)", unique_id, party_type)
         })
     );
 }
 
-pub fn assert_timeout_response(response: &TestResponse, app_state: &AppState) {
+pub fn assert_timeout_response(response: &TestResponse, app: &App, unique_id: &str) {
     assert_eq!(response.status, Status::RequestTimeout);
 
     assert_eq!(
         response.json,
         json!({
             "status": "timeout",
-            "message": "Request timed out",
-            "timeout_duration_sec": app_state.timeout.as_secs()
+            "message": format!("[{}] Request timed out", unique_id),
+            "timeout_duration_sec": app.timeout.as_secs()
         })
     );
 }

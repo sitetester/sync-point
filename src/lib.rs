@@ -2,32 +2,31 @@
 // This eliminates the need to manually declare `mod api;` in `main.rs`.
 // Instead, `lib.rs` defines all of project's modules, which can be accessed
 // from anywhere including `main.rs` or tests
-use app_state::AppState;
 use crate::api::routes::{index, wait_for_party};
+use app::App;
 use log::debug;
 use rocket::{self, routes, Build, Rocket};
 
 // Public modules available to other crates
 pub mod api;
-pub mod app_state;
+pub mod app;
 
 /// Builds and configures a Rocket application instance.  
 /// Accessible from application as well as tests
 pub fn build_rocket() -> Rocket<Build> {
     let path = "config.toml";
-    let state_result = if std::path::Path::new(path).exists() {
+    let app = if std::path::Path::new(path).exists() {
         debug!("{} found", path);
-        AppState::new(Some(path))
+        App::new(Some(path)).expect("Failed to initialize App with config")
     } else {
         debug!("{} not found", path);
-        AppState::new(None)
+        App::new(None).expect("Failed to initialize App with defaults")
     };
-    let app_state = state_result.expect("Failed to initialize AppState");
 
     rocket::build()
         // Attach our application state to Rocket's managed state
-        // This makes the AppState available to all route handlers
-        .manage(app_state)
+        // This makes the App available to all route handlers
+        .manage(app)
         // Mounts a collection of routes at the base path "/"
         .mount("/", routes![index, wait_for_party])
 }
