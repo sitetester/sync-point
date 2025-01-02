@@ -22,10 +22,12 @@ impl App {
 
     /// Creates a new instance of the application with configuration.
     ///
+    /// Configuration can be provided via
+    /// - TOML config file (optional)
+    /// - `APP_` prefix environment variable
+    ///
     /// # Arguments
     /// * `config_path` - Optional path to TOML config file. See tests how we could pass a custom path.
-    ///
-    /// Configuration can also be provided via `APP_` prefixed environment variable
     ///
     /// # Returns
     /// * `Ok(App)` - Successfully initialized application
