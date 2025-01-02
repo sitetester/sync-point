@@ -38,7 +38,7 @@ impl WaitPoint {
     }
 }
 
-/// Contains logic for handing the main route (/wait-for-second-party/<unique_id>)
+/// Manages the logic when 2 or more parties attempt to connect on some unique identifier 
 pub struct SyncService {
     pub wait_points: WaitPoints,
 }
