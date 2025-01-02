@@ -43,15 +43,8 @@ pub struct SyncService {
     pub wait_points: WaitPoints,
 }
 
-/// This satisfies Clippy's suggestion
-impl Default for SyncService {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl SyncService {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             wait_points: RwLock::new(HashMap::new()),
         }
