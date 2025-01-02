@@ -69,7 +69,7 @@ impl SyncService {
         state: &State<App>,
     ) -> Custom<Json<ApiResponse>> {
         // Wait for a notification with a timeout
-        // A future which completes when `notify_one()` or `notify_waiters()` is called
+        // A future which completes when `notify_one()` is called
         let result = tokio::time::timeout(
             Duration::from_secs(state.timeout.as_secs()),
             point.notify.notified(),
