@@ -21,7 +21,7 @@ pub fn index() -> &'static str {
 ///
 /// # Arguments
 /// * `unique_id` - A string identifier for matching parties
-/// * `state` - Rocket managed App  instance containing synchronization data
+/// * `state` - Rocket managed App instance containing synchronization data
 ///
 /// # Returns
 /// a `Custom<Json<ApiResponse>>` with:
