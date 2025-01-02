@@ -132,8 +132,8 @@ impl SyncService {
     ///
     /// # Returns
     /// a `Custom<Json<ApiResponse>>` with:
-    /// * HTTP Status code indicating relevant success/failure reason
-    /// * JSON response with success/error/timeout status and a friendly message
+    /// * 409 (Conflict) HTTP Status code
+    /// * JSON response with error message indicating party limit exceeded
     pub fn handle_extra_party(
         &self,
         unique_id: &str,
