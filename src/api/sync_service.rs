@@ -155,7 +155,7 @@ impl SyncService {
     /// * `unique_id` - The unique identifier of the wait point to remove
     ///
     /// # Returns
-    /// * `Ok(())` - If the wait point was successfully removed or didn't exist
+    /// * `Ok(())` - If the wait point was successfully removed
     /// * `Err(Custom<Json<ApiResponse>>>)` - Relevant error info
     fn cleanup_wait_point(&self, unique_id: &str) -> Result<(), Custom<Json<ApiResponse>>> {
         match self.wait_points.try_write() {
