@@ -31,7 +31,7 @@ but if only one party tries to join, then the timeout response should be
 **via cargo test**  
 2 types of tests are provided. Unit & Integration
 - `src/api/app_state.rs` functionality is tested via unit tests, hence tests are provided in the same file.
-- `tests/routes.rs` while this file contains integration tests, covering different scenarios.
+- `tests/api.rs` while this file contains integration tests, covering different scenarios.
 
 ---
 
